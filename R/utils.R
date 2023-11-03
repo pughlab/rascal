@@ -161,7 +161,7 @@ copy_number_maxima <- function(copy_numbers, min_copy_number = 0, max_copy_numbe
     mutate(up = density > lag(density)) %>%
     filter(up & !lead(up)) %>%
     filter(density >= lower_threshold * max(density)) %>%
-    select(-up)
+    dplyr::select(-up)
 }
 
 #' Collapse copy number bins into segments

@@ -56,7 +56,7 @@ if (!is.null(sample)) {
 locations <- fData(copy_number) %>%
   rownames_to_column(var = "id") %>%
   as_tibble() %>%
-  select(id, chromosome, start, end) %>%
+  dplyr::select(id, chromosome, start, end) %>%
   mutate(across(c(start, end), as.integer)) %>%
   mutate(chromosome = factor(chromosome, levels = unique(chromosome)))
 
@@ -87,7 +87,7 @@ for (sample_index in 1:number_of_samples) {
     mutate(across(c(copy_number, segmented), round, digits)) %>%
     mutate(copy_number = ifelse(copy_number == 0, 0, copy_number)) %>%
     mutate(segmented = ifelse(segmented == 0, 0, segmented)) %>%
-    select(sample, chromosome, start, end, copy_number, segmented)
+    dplyr::select(sample, chromosome, start, end, copy_number, segmented)
 
   print(summary(copy_number_for_sample$segmented))
 

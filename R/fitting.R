@@ -258,24 +258,24 @@ find_best_fit_solutions <- function(relative_copy_numbers, weights = NULL,
     mutate(x = dense_rank(cellularity)) %>%
     mutate(y = dense_rank(ploidy))
 
-  solutions <- select(distances, id, x, y, distance)
+  solutions <- dplyr::select(distances, id, x, y, distance)
 
   for (xdelta in -1:1) {
     for (ydelta in -1:1) {
       if (xdelta != 0 || ydelta != 0) {
         solutions <- solutions %>%
           mutate(xc = x + xdelta, yc = y + ydelta) %>%
-          left_join(select(distances, xc = x, yc = y, dc = distance), by = c("xc", "yc")) %>%
+          left_join(dplyr::select(distances, xc = x, yc = y, dc = distance), by = c("xc", "yc")) %>%
           filter(is.na(dc) | distance <= dc) %>%
-          select(id, x, y, distance)
+          dplyr::select(id, x, y, distance)
       }
     }
   }
 
-  distances <- select(distances, -x, -y)
+  distances <- dplyr::select(distances, -x, -y)
 
   solutions <- solutions %>%
-    select(id) %>%
+    dplyr::select(id) %>%
     left_join(distances, by = "id")
 
   # only retain solutions with distances no more than
@@ -313,8 +313,8 @@ find_best_fit_solutions <- function(relative_copy_numbers, weights = NULL,
 
     pairs <- expand_grid(rank1 = 1:nrow(solutions), rank2 = 1:nrow(solutions)) %>%
       filter(rank2 > rank1) %>%
-      left_join(select(solutions, rank1 = rank, x1 = x, y1 = y, distance1 = distance), by = "rank1") %>%
-      left_join(select(solutions, rank2 = rank, x2 = x, y2 = y, distance2 = distance), by = "rank2") %>%
+      left_join(dplyr::select(solutions, rank1 = rank, x1 = x, y1 = y, distance1 = distance), by = "rank1") %>%
+      left_join(dplyr::select(solutions, rank2 = rank, x2 = x, y2 = y, distance2 = distance), by = "rank2") %>%
       mutate(xy2 = (x2 - x1) ^ 2 + (y2 - y1) ^ 2)
 
     to_remove <- tibble(rank = integer(0))
@@ -325,7 +325,7 @@ find_best_fit_solutions <- function(relative_copy_numbers, weights = NULL,
 
       proximal <- pairs %>%
         filter(rank1 == rank, xy2 <= solution_proximity_threshold2) %>%
-        select(rank = rank2)
+        dplyr::select(rank = rank2)
 
       to_remove <- bind_rows(to_remove, proximal)
 
@@ -336,7 +336,7 @@ find_best_fit_solutions <- function(relative_copy_numbers, weights = NULL,
 
     solutions <- solutions %>%
       anti_join(to_remove, by = "rank") %>%
-      select(id, ploidy, cellularity, distance)
+      dplyr::select(id, ploidy, cellularity, distance)
   }
 
 
@@ -344,8 +344,8 @@ find_best_fit_solutions <- function(relative_copy_numbers, weights = NULL,
   if (keep_all) {
     distances %>%
       mutate(best_fit = id %in% solutions$id) %>%
-      select(ploidy, cellularity, distance, best_fit)
+      dplyr::select(ploidy, cellularity, distance, best_fit)
   } else {
-    select(solutions, ploidy, cellularity, distance)
+    dplyr::select(solutions, ploidy, cellularity, distance)
   }
 }

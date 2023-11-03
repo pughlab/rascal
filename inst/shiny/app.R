@@ -517,7 +517,7 @@ server <- function(input, output, session) {
         copy_number_data <- mutate(copy_number_data, copy_number = NA)
       }
 
-      copy_number_data <- select(copy_number_data, one_of(expected_columns))
+      copy_number_data <- dplyr::select(copy_number_data, one_of(expected_columns))
 
       # check for missing values in sample, chromosome, start and end columns
       n <- nrow(copy_number_data)
@@ -733,7 +733,7 @@ server <- function(input, output, session) {
   get_cached_ploidy_and_cellularity <- function(sample) {
     sample_cache <- filter(isolate(reactive_values$ploidy_and_cellularity_cache), sample == !!sample)
     if (nrow(sample_cache) == 1)
-      as.list(select(sample_cache, ploidy, cellularity))
+      as.list(dplyr::select(sample_cache, ploidy, cellularity))
     else
       list(ploidy = NA, cellularity = NA)
   }
@@ -777,14 +777,14 @@ server <- function(input, output, session) {
       copy_number <- Biobase::fData(copy_number) %>%
         rownames_to_column(var = "id") %>%
         as_tibble() %>%
-        select(id, chromosome, start, end) %>%
+        dplyr::select(id, chromosome, start, end) %>%
         mutate(across(c(start, end), as.integer)) %>%
         mutate(chromosome = factor(chromosome, levels = unique(chromosome))) %>%
         arrange(chromosome, start) %>%
         mutate(sample = selected_sample) %>%
         mutate(copy_number = copy_number_values) %>%
         mutate(segmented = segmented_values) %>%
-        select(sample, chromosome, start, end, copy_number, segmented)
+        dplyr::select(sample, chromosome, start, end, copy_number, segmented)
     } else {
       copy_number <- filter(copy_number_data, sample == selected_sample)
     }
@@ -909,10 +909,10 @@ server <- function(input, output, session) {
     if (is.null(copy_number)) return(NULL)
 
     copy_number <- copy_number %>%
-      select(chromosome, start, end, copy_number = log2ratio)
+      dplyr::select(chromosome, start, end, copy_number = log2ratio)
 
     segments <- segments_for_selected_sample() %>%
-      select(chromosome, start, end, copy_number = log2ratio)
+      dplyr::select(chromosome, start, end, copy_number = log2ratio)
 
     chromosome_lengths <- chromosome_lengths_for_selected_sample()
 
@@ -922,7 +922,7 @@ server <- function(input, output, session) {
     if (input$show_absolute_copy_number) {
       copy_number_steps <- copy_number_steps()
       if (!is.null(copy_number_steps)) {
-        copy_number_steps <- select(copy_number_steps, absolute_copy_number, copy_number = log2ratio)
+        copy_number_steps <- dplyr::select(copy_number_steps, absolute_copy_number, copy_number = log2ratio)
       }
     }
 
@@ -970,7 +970,7 @@ server <- function(input, output, session) {
       )
     } else {
       copy_number_data <- copy_number_data %>%
-        select(
+        dplyr::select(
           chromosome,
           start,
           end,
@@ -1037,10 +1037,10 @@ server <- function(input, output, session) {
     if (is.null(copy_number) || is.null(location$chromosome)) return(NULL)
 
     copy_number <- copy_number %>%
-      select(chromosome, start, end, copy_number = log2ratio)
+      dplyr::select(chromosome, start, end, copy_number = log2ratio)
 
     segments <- segments_for_selected_sample() %>%
-      select(chromosome, start, end, copy_number = log2ratio)
+      dplyr::select(chromosome, start, end, copy_number = log2ratio)
 
     chromosome_lengths <- chromosome_lengths_for_selected_sample()
 
@@ -1050,7 +1050,7 @@ server <- function(input, output, session) {
     if (input$show_absolute_copy_number) {
       copy_number_steps <- copy_number_steps()
       if (!is.null(copy_number_steps)) {
-        copy_number_steps <- select(copy_number_steps, absolute_copy_number, copy_number = log2ratio)
+        copy_number_steps <- dplyr::select(copy_number_steps, absolute_copy_number, copy_number = log2ratio)
       }
     }
 
@@ -1136,7 +1136,7 @@ server <- function(input, output, session) {
 
     if (nrow(segment) != 1) return(NULL)
 
-    select(segment, chromosome, start, end, copy_number, log2ratio)
+    dplyr::select(segment, chromosome, start, end, copy_number, log2ratio)
   }
 
   # get the copy number segments or bins corresponding to the given chromosome range
@@ -1152,7 +1152,7 @@ server <- function(input, output, session) {
       segments <- filter(copy_number, chromosome == !!chromosome, start <= !!end, end >= !!start)
     }
 
-    select(segments, chromosome, start, end, copy_number, log2ratio)
+    dplyr::select(segments, chromosome, start, end, copy_number, log2ratio)
   }
 
   # compute chromosome offsets used in genome copy number plot
@@ -1300,7 +1300,7 @@ server <- function(input, output, session) {
     if (input$show_absolute_copy_number) {
       copy_number_steps <- copy_number_steps()
       if (!is.null(copy_number_steps)) {
-        copy_number_steps <- select(copy_number_steps, absolute_copy_number, copy_number = relative_copy_number)
+        copy_number_steps <- dplyr::select(copy_number_steps, absolute_copy_number, copy_number = relative_copy_number)
       }
     }
 
@@ -1420,7 +1420,7 @@ server <- function(input, output, session) {
     if (is.null(distances)) return(NULL)
     distances %>%
       filter(best_fit) %>%
-      select(-best_fit) %>%
+      dplyr::select(-best_fit) %>%
       arrange(distance, ploidy)
   })
 
@@ -1538,7 +1538,7 @@ server <- function(input, output, session) {
               mutate(tumour_fraction = tumour_fraction(absolute_copy_number, cellularity)) %>%
               mutate(tumour_fraction = round(tumour_fraction, digits = 2)) %>%
               ungroup() %>%
-              select(-absolute_copy_number)
+              dplyr::select(-absolute_copy_number)
             column_names <- c(column_names, str_c("Tumour fraction (", gene$name, ")"))
           }
         }

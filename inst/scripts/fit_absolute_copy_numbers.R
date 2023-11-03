@@ -60,13 +60,13 @@ copy_number_for_sample <- function(copy_number, sample) {
     Biobase::fData(copy_number) %>%
       rownames_to_column(var = "id") %>%
       as_tibble() %>%
-      select(id, chromosome, start, end) %>%
+      dplyr::select(id, chromosome, start, end) %>%
       mutate(across(c(start, end), as.integer)) %>%
       mutate(chromosome = factor(chromosome, levels = unique(chromosome))) %>%
       mutate(sample = sample) %>%
       mutate(copy_number = copy_number_values) %>%
       mutate(segmented = segmented_values) %>%
-      select(sample, chromosome, start, end, copy_number, segmented)
+      dplyr::select(sample, chromosome, start, end, copy_number, segmented)
   } else {
     filter(copy_number, sample == !!sample)
   }

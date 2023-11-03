@@ -133,7 +133,7 @@ genome_copy_number_plot <- function(copy_number,
     mutate(start = offset + 1, end = offset + length) %>%
     mutate(mid = offset + round(length / 2))
 
-  offsets <- select(chromosomes, chromosome, offset)
+  offsets <- dplyr::select(chromosomes, chromosome, offset)
 
   # filter copy number data for the specified sample
   if (!is.null(sample)) {
@@ -154,12 +154,12 @@ genome_copy_number_plot <- function(copy_number,
   copy_number <- copy_number %>%
     left_join(offsets, by = "chromosome") %>%
     mutate(position = position + offset) %>%
-    select(-offset)
+    dplyr::select(-offset)
 
   segments <- segments %>%
     left_join(offsets, by = "chromosome") %>%
     mutate(across(c(start, end), ~ . + offset)) %>%
-    select(-offset)
+    dplyr::select(-offset)
 
   if (is.null(min_copy_number)) {
     min_copy_number <- min(copy_number$copy_number, segments$copy_number)
@@ -183,7 +183,7 @@ genome_copy_number_plot <- function(copy_number,
 
   segment_lines <- segments %>%
     mutate(segment_number = row_number()) %>%
-    select(segment_number, start, end, copy_number) %>%
+    dplyr::select(segment_number, start, end, copy_number) %>%
     pivot_longer(c(start, end), names_to = "type", values_to = "position") %>%
     arrange(segment_number)
 
@@ -410,7 +410,7 @@ chromosome_copy_number_plot <- function(copy_number,
 
   segment_lines <- segments %>%
     mutate(segment_number = row_number()) %>%
-    select(segment_number, start, end, copy_number) %>%
+    dplyr::select(segment_number, start, end, copy_number) %>%
     pivot_longer(c(start, end), names_to = "type", values_to = "position") %>%
     arrange(segment_number)
 
